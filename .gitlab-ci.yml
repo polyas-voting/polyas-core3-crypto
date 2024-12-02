@@ -3,8 +3,8 @@ include:
     ref: main
     file: '/templates/gitlab.yml'
 
-build:
-  extends: .maven-build
+#build:
+#  extends: .maven-build
 
-# deploy:
-#   extends: .maven-deploy
+deploy:
+   extends: .maven-deploy
