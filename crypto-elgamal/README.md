@@ -9,7 +9,7 @@ such as:
 - verifiable shuffle (the algorithm by Wikstroem et al.)
 
 The algorithms are expressed over an abstract 
-[cyclic group](src/main/java/de/polyas/core3/crypto/elgamal/CyclicGroup.kt),
+[cyclic group](src/main/kotlin/de/polyas/core3/crypto/elgamal/CyclicGroup.kt),
 for which two instantiations are provided: 
 
  - the Schnorr group (the group of quadratic residues modulo a safe prime),
