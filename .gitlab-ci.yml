@@ -6,5 +6,5 @@ include:
 build:
   extends: .maven-build
 
-deploy:
-  extends: .maven-deploy
+# deploy:
+#   extends: .maven-deploy
