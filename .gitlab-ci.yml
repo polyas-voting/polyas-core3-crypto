@@ -1,0 +1,20 @@
+include:
+  - project: 'ng/open-base'
+    ref: main
+    file: '/templates/gitlab.yml'
+
+build:
+  extends: .maven-build
+  only:
+    refs:
+      - branches
+  except:
+    refs:
+      - trunk
+
+deploy:
+  extends: .maven-deploy
+  only:
+    refs:
+      - tags
+      - main
