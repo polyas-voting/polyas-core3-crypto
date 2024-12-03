@@ -4,7 +4,24 @@ include:
     file: '/templates/gitlab.yml'
 
 build:
-   extends: .maven-build
+  extends: .maven-build
+  only:
+    refs:
+      - branches
+  except:
+    refs:
+      - master
+      - develop
+      - trunk
+      - draft
+
+
 
 deploy:
-   extends: .maven-deploy
+  extends: .maven-deploy
+  only:
+    refs:
+      - master
+      - develop
+      - trunk
+      - draft
