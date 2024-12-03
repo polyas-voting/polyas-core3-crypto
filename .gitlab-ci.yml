@@ -10,8 +10,6 @@ build:
       - branches
   except:
     refs:
-      - master
-      - develop
       - trunk
       - draft
 
@@ -19,7 +17,5 @@ deploy:
   extends: .maven-deploy
   only:
     refs:
-      - master
-      - develop
       - trunk
       - draft
