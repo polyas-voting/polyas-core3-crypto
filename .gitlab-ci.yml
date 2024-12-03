@@ -15,8 +15,6 @@ build:
       - trunk
       - draft
 
-
-
 deploy:
   extends: .maven-deploy
   only:
