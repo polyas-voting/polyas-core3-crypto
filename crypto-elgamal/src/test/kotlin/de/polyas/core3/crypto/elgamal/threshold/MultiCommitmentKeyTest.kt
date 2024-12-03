@@ -27,6 +27,20 @@ class MultiCommitmentKeyTest {
     }
 
     @Test
+    fun testCommitOneValue() {
+        val n = 2
+        val group = SchnorrGroup.group512
+        val ck = MultiCommitmentKey.generateVerifiably(group, n, "seed")
+        val v1 = BigInteger.valueOf(10)
+        val randomness = BigInteger.valueOf(88897375)
+
+        val commitment = ck.commit(v1, randomness)
+        val expected = ck.commit(listOf(v1), randomness)
+
+        assertEquals(expected, commitment)
+    }
+
+    @Test
     fun testGenerate() {
         val n = 100
         val group = SchnorrGroup.group512
