@@ -136,7 +136,6 @@ object GuarderSRNG {
     interface Interceptor {
         fun bytes(bytes: ByteArray)
         fun bi(modulus: BigInteger, value: BigInteger)
-        fun number(upperLimit: Int, number: Int)
         fun other()
     }
 }

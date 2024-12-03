@@ -48,10 +48,12 @@ class StreamEncryptionKtTest {
         val key = SymmetricKey.generate()
         val message = "SymmetricEncryptionWorks"
         val ins = message.toByteArray().inputStream()
-        val encryptedStream = ins.encrypt(key).readBytes()
-        assertEquals(message.length+16, encryptedStream.size)
-        val dec = encryptedStream.inputStream().decrypt(key).readBytes().toString(StandardCharsets.UTF_8)
-        assertEquals(message, dec)
+        ins.encrypt(key).use { encryptedStream ->
+            val encryptedBytes = encryptedStream.readBytes()
+            assertEquals(message.length+16, encryptedBytes.size)
+            val dec = encryptedBytes.inputStream().decrypt(key).readBytes().toString(StandardCharsets.UTF_8)
+            assertEquals(message, dec)
+        }
     }
 }
 

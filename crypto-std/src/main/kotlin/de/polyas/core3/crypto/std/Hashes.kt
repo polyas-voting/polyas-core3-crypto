@@ -158,6 +158,10 @@ class PartialDigest(private val md: MessageDigest) {
         md.update(bytes)
     }
 
+    fun digest(message: Message) {
+        md.update(message.asBytes())
+    }
+
     fun digest(vararg bs: ByteArray) {
         for (b in bs) md.update(b)
     }

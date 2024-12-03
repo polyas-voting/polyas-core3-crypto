@@ -98,11 +98,6 @@ class MessageConstructor(initialCapacity: Int) {
     fun put(str: String, charset: Charset?): MessageConstructor =
         put(str.toByteArray(charset!!))
 
-    fun put(i: BigInteger): MessageConstructor {
-        put(i.toByteArray())
-        return this
-    }
-
     fun asBytes(): ByteArray {
         val newBuf = buf.duplicate()
         newBuf.flip()

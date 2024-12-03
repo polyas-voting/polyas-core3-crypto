@@ -52,6 +52,45 @@ class HashesTest {
     }
 
     @Test
+    fun `digesting is compatible with the message builder`() {
+        val bytes = Message.fromHexString("aaff0078").asBytes()
+        val message = Message.fromHexString("a0f80078000071")
+        val h1 = Hashes.sha512 {
+            digest(bytes)
+            digest(message)
+            digest("abc")
+            digest(12)
+            digest(7888L)
+        }
+        val m = buildMessage {
+            put(bytes)
+            put(message)
+            put("abc")
+            put(12)
+            put(7888L)
+        }
+        val h2 = Hashes.sha512(m)
+
+        assertTrue(h1 contentEquals  h2)
+    }
+
+    @Test
+    fun `digesting a big integer includes the length`() {
+        val bi = BigInteger.valueOf(11223344000090321L)
+        val h1 = Hashes.sha512 {
+            digest(bi)
+        }
+        val m = buildMessage {
+            val biBytes = bi.toByteArray()
+            put(biBytes.size)
+            put(biBytes)
+        }
+        val h2 = Hashes.sha512(m)
+
+        assertTrue(h1 contentEquals  h2)
+    }
+
+    @Test
     fun partialDigest() {
         val partialDigest = initialDigestSha512 { digest("aa") }
         val ax1 = partialDigest.continueHashing { digest("xx") }
