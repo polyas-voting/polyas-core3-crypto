@@ -10,6 +10,7 @@ primitives.
  * __Wrappers for standard cryptographic methods__
 
      - symmetric and asymmetric encryption,
+     - signing and signature verification,
      - hashing.
 
  * __Utilities built on top of standard cryptographic primitives__
@@ -19,4 +20,3 @@ primitives.
      - hashing into a space of big integers ($Z_q$)
      - deterministic encryption intended for encryption of keys in key-value 
        data stores.
-     - an implementation of time-based one time passwords.
