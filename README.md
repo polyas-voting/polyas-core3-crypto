@@ -1,7 +1,6 @@
 # Polyas Core 3 Crypto
 
-This repository contains the cryptographic library used by POLYAS Core 3
-e-voting platform. 
+Cryptographic libraries used by POLYAS Core 3 e-voting systems 
 
 ## The content of this repository
 
