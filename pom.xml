@@ -93,6 +93,11 @@
                 <version>1.21.0</version>
                 <configuration>
                     <versionDigitToIncrement>2</versionDigitToIncrement>
+                    <commitMessages>
+                        <releaseStartMessage>version @{version}</releaseStartMessage>
+                        <releaseFinishMessage>bump the version to @{version}</releaseFinishMessage>
+                        <releaseVersionUpdateMessage>bump the version to @{version}</releaseVersionUpdateMessage>
+                    </commitMessages>
                     <gitFlowConfig>
                         <productionBranch>draft</productionBranch>
                         <developmentBranch>draft</developmentBranch>
