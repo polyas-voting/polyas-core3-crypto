@@ -53,6 +53,18 @@ class SymmetricKey {
         encrypt(plaintext, Message.fromBytes(zeroIv))
 
     /**
+     * Encrypts the given [plaintext] using the initialisation vector [iv]. It does not
+     * include the initialisation vector in the returned message.
+     */
+    fun encrypt(plaintext: Message, iv: Message): Message {
+        require (iv.length() == IV_LEN)
+        val c = Cipher.getInstance("AES/GCM/NoPadding")
+        val spec = GCMParameterSpec(GCM_TAG_LENGTH * 8, iv.array(), iv.offset(), iv.length())
+        c.init(Cipher.ENCRYPT_MODE, key, spec)
+        return Message.fromBytes(c.doFinal(plaintext.array(), plaintext.offset(), plaintext.length()))
+    }
+
+    /**
      * Decrypts the given [ciphertext] with this key. It assumes that the initialisation
      * vector is included in the initial part of the [ciphertext].
      *
@@ -74,14 +86,6 @@ class SymmetricKey {
      */
     fun deterministicDecryption(ciphertext: Message): Result<Message> =
         decrypt(ciphertext, zeroIvMsg)
-
-    private fun encrypt(plaintext: Message, iv: Message): Message {
-        require (iv.length() == IV_LEN)
-        val c = Cipher.getInstance("AES/GCM/NoPadding")
-        val spec = GCMParameterSpec(GCM_TAG_LENGTH * 8, iv.array(), iv.offset(), iv.length())
-        c.init(Cipher.ENCRYPT_MODE, key, spec)
-        return Message.fromBytes(c.doFinal(plaintext.array(), plaintext.offset(), plaintext.length()))
-    }
 
     private fun decrypt(ciphertext: Message, ivMsg: Message): Result<Message> = runCatching {
         require (ivMsg.length() == IV_LEN)
