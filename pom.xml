@@ -94,8 +94,8 @@
                 <configuration>
                     <versionDigitToIncrement>1</versionDigitToIncrement>
                     <gitFlowConfig>
-                        <productionBranch>trunk</productionBranch>
-                        <developmentBranch>trunk</developmentBranch>
+                        <productionBranch>draft</productionBranch>
+                        <developmentBranch>draft</developmentBranch>
                     </gitFlowConfig>
                 </configuration>
             </plugin>
