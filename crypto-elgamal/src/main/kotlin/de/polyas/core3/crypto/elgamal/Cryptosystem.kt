@@ -1,6 +1,6 @@
 package de.polyas.core3.crypto.elgamal
 
-import de.polyas.core3.crypto.std.GuarderSRNG
+import de.polyas.core3.crypto.std.GuardedSRNG
 import java.math.BigInteger
 
 /**
@@ -18,7 +18,7 @@ class Cryptosystem<GroupElem>(val group: CyclicGroup<GroupElem>) {
         encryptGroupElement(encryptionKey, group.encode(message), randomCoin)
 
     fun encryptGroupElement(pk: GroupElem, message: GroupElem): Ciphertext<GroupElem> {
-        val r = GuarderSRNG.nextBigIntInRange(BigInteger.ONE, group.order)
+        val r = GuardedSRNG.nextBigIntInRange(BigInteger.ONE, group.order)
         return encryptGroupElement(pk, message, r)
     }
 

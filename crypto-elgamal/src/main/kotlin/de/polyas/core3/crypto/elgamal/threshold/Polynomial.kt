@@ -2,7 +2,7 @@ package de.polyas.core3.crypto.elgamal.threshold
 
 import de.polyas.core3.crypto.elgamal.CyclicGroup
 import de.polyas.core3.crypto.annotation.Doc
-import de.polyas.core3.crypto.std.GuarderSRNG
+import de.polyas.core3.crypto.std.GuardedSRNG
 import java.math.BigInteger
 
 @Doc("A polynomial (used for secret sharing schemes), given as a list of integer coefficients")
@@ -42,8 +42,8 @@ data class Polynomial<GroupElement>(
         fun <GroupElement> random(numberOfCoefficients: Int, group: CyclicGroup<GroupElement>): Polynomial<GroupElement> {
             val coefficients = List(numberOfCoefficients) { index ->
                 when (index) {
-                    (numberOfCoefficients - 1) -> GuarderSRNG.nextBigIntInRange(BigInteger.ONE, group.order)
-                    else -> GuarderSRNG.nextBigIntInRange(BigInteger.ZERO, group.order)
+                    (numberOfCoefficients - 1) -> GuardedSRNG.nextBigIntInRange(BigInteger.ONE, group.order)
+                    else -> GuardedSRNG.nextBigIntInRange(BigInteger.ZERO, group.order)
                 }
             }
             return Polynomial(coefficients)

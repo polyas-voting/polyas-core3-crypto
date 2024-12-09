@@ -121,6 +121,12 @@ class Message internal constructor(
 		    Message(bytes, 0, bytes.size)
 
         /**
+         * Generates a random message of the given [byteLength].
+         */
+        fun random(byteLength: Int): Message =
+            GuardedSRNG.nextMessage(byteLength)
+
+        /**
          * Compares two arrays w.r.t. the lexicographic order, where bytes are treated
          * as unsigned values.
          */

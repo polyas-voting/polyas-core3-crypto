@@ -33,15 +33,21 @@ class SymmetricKey {
 
     /**
      * Encrypts the given [plaintext] with this key. A random initialisation vector
-     * (of size [IV_LEN]) is included in the initial part of the result message.
+     * (of size [IV_LEN]) is used and  included in the initial part of the result message.
      */
     fun encrypt(plaintext: Message): Message {
-        val ivBytes = ByteArray(IV_LEN)
-        GuarderSRNG.nextBytes(ivBytes)
-        val iv = Message.fromBytes(ivBytes)
+        val iv = Message.random(IV_LEN)
+        return encrypt(plaintext, iv)
+    }
+
+    /**
+     * Encrypts the given [plaintext] using explicitly given initialisation vector.
+     * The initialisation vector is include in the returned message (as the first part of it).
+     */
+    fun encrypt(plaintext: Message, iv: Message): Message {
         return buildMessage {
             put(iv)
-            put(encrypt(plaintext, iv))
+            put(justEncrypt(plaintext, iv))
         }
     }
 
@@ -50,19 +56,7 @@ class SymmetricKey {
      * using the zero initialisation vector.
      */
     fun deterministicEncryption(plaintext: Message): Message =
-        encrypt(plaintext, Message.fromBytes(zeroIv))
-
-    /**
-     * Encrypts the given [plaintext] using the initialisation vector [iv]. It does not
-     * include the initialisation vector in the returned message.
-     */
-    fun encrypt(plaintext: Message, iv: Message): Message {
-        require (iv.length() == IV_LEN)
-        val c = Cipher.getInstance("AES/GCM/NoPadding")
-        val spec = GCMParameterSpec(GCM_TAG_LENGTH * 8, iv.array(), iv.offset(), iv.length())
-        c.init(Cipher.ENCRYPT_MODE, key, spec)
-        return Message.fromBytes(c.doFinal(plaintext.array(), plaintext.offset(), plaintext.length()))
-    }
+        justEncrypt(plaintext, Message.fromBytes(zeroIv))
 
     /**
      * Decrypts the given [ciphertext] with this key. It assumes that the initialisation
@@ -93,6 +87,18 @@ class SymmetricKey {
         val c = Cipher.getInstance("AES/GCM/NoPadding")
         c.init(Cipher.DECRYPT_MODE, key, iv)
         Message.fromBytes(c.doFinal(ciphertext.array(), ciphertext.offset(), ciphertext.length()))
+    }
+
+    /**
+     * Encrypts the given [plaintext] using the initialisation vector [iv] without
+     * adding the initialisation vector to the returned message.
+     */
+    private fun justEncrypt(plaintext: Message, iv: Message): Message {
+        require (iv.length() == IV_LEN)
+        val c = Cipher.getInstance("AES/GCM/NoPadding")
+        val spec = GCMParameterSpec(GCM_TAG_LENGTH * 8, iv.array(), iv.offset(), iv.length())
+        c.init(Cipher.ENCRYPT_MODE, key, spec)
+        return Message.fromBytes(c.doFinal(plaintext.array(), plaintext.offset(), plaintext.length()))
     }
 
     fun underlyingKey(): SecretKey = key

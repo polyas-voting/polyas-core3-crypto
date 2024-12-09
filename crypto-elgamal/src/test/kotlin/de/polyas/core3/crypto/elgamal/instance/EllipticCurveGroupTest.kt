@@ -2,7 +2,7 @@ package de.polyas.core3.crypto.elgamal.instance
 
 import de.polyas.core3.crypto.elgamal.Cryptosystem
 import de.polyas.core3.crypto.elgamal.instance.EllipticCurveInst.Companion.curve
-import de.polyas.core3.crypto.std.GuarderSRNG
+import de.polyas.core3.crypto.std.GuardedSRNG
 import java.math.BigInteger
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -140,7 +140,7 @@ class EllipticCurveGroupTest {
 
     companion object {
         fun random(upperBound: BigInteger?): BigInteger {
-            return GuarderSRNG.nextBigIntInRange(BigInteger.valueOf(2), upperBound!!)
+            return GuardedSRNG.nextBigIntInRange(BigInteger.valueOf(2), upperBound!!)
         }
 
         fun randomSafeElement(g: EllipticCurveInst): BigInteger {

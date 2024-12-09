@@ -10,15 +10,27 @@ class SymmetricKeyTest {
 
     @Test
     fun `encryption-decryption`() {
-        val plaintext = GuarderSRNG.nextMessage(10000)
+        val plaintext = Message.random(10000)
         val encrypted = key.encrypt(plaintext)
         val decrypted = key.decrypt(encrypted).getOrThrow()
         assertEquals(plaintext, decrypted)
     }
 
     @Test
+    fun `encryption with explicit IV`() {
+        val plaintext = Message.random(10000)
+        val iv = Message.random(SymmetricKey.IV_LEN)
+        val encrypted = key.encrypt(plaintext, iv)
+        val decrypted = key.decrypt(encrypted).getOrThrow()
+        assertEquals(plaintext, decrypted)
+
+        val initial = encrypted.slice(0, SymmetricKey.IV_LEN)
+        assertEquals(iv, initial)
+    }
+
+    @Test
     fun `deterministic encryption-decryption`() {
-        val plaintext = GuarderSRNG.nextMessage(10000)
+        val plaintext = Message.random(10000)
         val encrypted = key.deterministicEncryption(plaintext)
         val decrypted = key.deterministicDecryption(encrypted).getOrThrow()
         assertEquals(plaintext, decrypted)

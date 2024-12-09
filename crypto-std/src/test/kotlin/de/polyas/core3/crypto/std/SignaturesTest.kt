@@ -9,7 +9,7 @@ import kotlin.test.assertEquals
 class SignaturesTest {
     @Test
     fun `signing-verifying`() {
-        val message = GuarderSRNG.nextMessage(400)
+        val message = GuardedSRNG.nextMessage(400)
         val keyPair = SigningKeyPair.generate()
         val signature = keyPair.signingKey.sign(message)
         assertEquals(SignatureVerificationResult.OK, keyPair.verificationKey.verify(signature, message))
@@ -17,15 +17,15 @@ class SignaturesTest {
 
     @Test
     fun `wrong signature is rejected`() {
-        val message = GuarderSRNG.nextMessage(400)
-        val falseSignature = GuarderSRNG.nextMessage(384)
+        val message = GuardedSRNG.nextMessage(400)
+        val falseSignature = GuardedSRNG.nextMessage(384)
         val keyPair = SigningKeyPair.generate()
         assertEquals(SignatureVerificationResult.Invalid, keyPair.verificationKey.verify(falseSignature, message))
     }
 
     @Test
     fun testSerialization() {
-        val message = GuarderSRNG.nextMessage(400)
+        val message = GuardedSRNG.nextMessage(400)
         val keyPair = SigningKeyPair.generate()
         val signature = keyPair.signingKey.sign(message)
 

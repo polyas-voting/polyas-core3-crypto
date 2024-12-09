@@ -2,7 +2,7 @@ package de.polyas.core3.crypto.elgamal.instance
 
 import de.polyas.core3.crypto.elgamal.Ciphertext
 import de.polyas.core3.crypto.elgamal.Cryptosystem
-import de.polyas.core3.crypto.std.GuarderSRNG
+import de.polyas.core3.crypto.std.GuardedSRNG
 import java.math.BigInteger
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -111,6 +111,6 @@ class ElgamalGroupTest {
 
     private companion object {
         fun randomSafeZq(g: SchnorrGroup): BigInteger =
-            GuarderSRNG.nextBigIntInRange(BigInteger.valueOf(2), g.order)
+            GuardedSRNG.nextBigIntInRange(BigInteger.valueOf(2), g.order)
     }
 }

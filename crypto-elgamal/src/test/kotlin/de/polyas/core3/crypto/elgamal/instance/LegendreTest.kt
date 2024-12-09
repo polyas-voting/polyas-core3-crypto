@@ -1,6 +1,6 @@
 package de.polyas.core3.crypto.elgamal.instance
 
-import de.polyas.core3.crypto.std.GuarderSRNG
+import de.polyas.core3.crypto.std.GuardedSRNG
 import java.math.BigInteger.TWO
 import java.math.BigInteger.ZERO
 import kotlin.test.Test
@@ -22,7 +22,7 @@ class LegendreTest {
     @Test
     fun positive() {
         repeat (100) {
-            val a = GuarderSRNG.nextBigIntInRange(TWO, p)
+            val a = GuardedSRNG.nextBigIntInRange(TWO, p)
             val aa = (a * a).mod(p)
 
             val ls = legendreSymbol(aa, p) // expected to be +1
@@ -33,7 +33,7 @@ class LegendreTest {
     @Test
     fun negative() {
         repeat (100) {
-            val a = GuarderSRNG.nextBigIntInRange(TWO, p)
+            val a = GuardedSRNG.nextBigIntInRange(TWO, p)
             val aa = (a * a).mod(p)
             val ls = legendreSymbol(p - aa, p)
             assertEquals(-1, ls.signum())

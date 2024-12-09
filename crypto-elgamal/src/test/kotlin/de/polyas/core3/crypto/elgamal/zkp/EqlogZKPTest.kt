@@ -5,7 +5,7 @@ import de.polyas.core3.crypto.elgamal.VerificationResult
 import de.polyas.core3.crypto.elgamal.instance.SchnorrGroup
 import de.polyas.core3.crypto.elgamal.instance.EllipticCurveInst
 import de.polyas.core3.crypto.elgamal.zkp.EqlogZKP.InteractiveProver
-import de.polyas.core3.crypto.std.GuarderSRNG
+import de.polyas.core3.crypto.std.GuardedSRNG
 import java.math.BigInteger
 import kotlin.test.Test
 import kotlin.test.assertTrue
@@ -24,9 +24,9 @@ class EqlogZKPTest {
     private fun <GroupElem> testInteractive(group: CyclicGroup<GroupElem>) {
         with(group) {
             val baseX = group.generator
-            val exponent = GuarderSRNG.nextBigInt(group.order)
+            val exponent = GuardedSRNG.nextBigInt(group.order)
             val baseY: GroupElem = baseX.pow(exponent)
-            val x = GuarderSRNG.nextBigInt(group.order)
+            val x = GuardedSRNG.nextBigInt(group.order)
             val X: GroupElem = baseX.pow(x)
             val Y: GroupElem = baseY.pow(x)
             val statement = EqlogZKP.Statement(baseX, baseY, X, Y)
@@ -52,9 +52,9 @@ class EqlogZKPTest {
     private fun <GroupElem> testInvalid(group: CyclicGroup<GroupElem>) {
         with (group) {
             val baseX = group.generator
-            val exponent = GuarderSRNG.nextBigInt(group.order)
+            val exponent = GuardedSRNG.nextBigInt(group.order)
             val baseY: GroupElem = baseX.pow(exponent)
-            val x = GuarderSRNG.nextBigInt(group.order)
+            val x = GuardedSRNG.nextBigInt(group.order)
             val X: GroupElem = baseX.pow(x)
             val Y: GroupElem = baseY.pow(x)
             val statement = EqlogZKP.Statement(baseX, baseY, X, Y)
