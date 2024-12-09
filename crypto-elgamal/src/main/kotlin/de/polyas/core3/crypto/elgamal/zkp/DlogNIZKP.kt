@@ -6,7 +6,7 @@ import de.polyas.core3.crypto.elgamal.VerificationResult
 import de.polyas.core3.crypto.elgamal.zkp.DlogNIZKP.Challenger
 import de.polyas.core3.crypto.std.uniformHash
 import de.polyas.core3.crypto.annotation.Doc
-import de.polyas.core3.crypto.std.GuardedSRNG
+import de.polyas.core3.crypto.std.SRNG
 import java.math.BigInteger
 
 /**
@@ -41,7 +41,7 @@ class DlogNIZKP<GroupElem>(
      * Creates a ZKP of knowledge of [secretExponent] such that [X] = generator^x.
      */
     fun createProof(X: GroupElem, secretExponent: BigInteger): Proof {
-        val a = GuardedSRNG.nextBigInt(q)
+        val a = SRNG.nextBigInt(q)
         val initialMessage = group.powerOfG(a)
         val challenge = challenger.challenge(X, initialMessage)
         val finalMessage = (a + challenge * secretExponent).mod(q)

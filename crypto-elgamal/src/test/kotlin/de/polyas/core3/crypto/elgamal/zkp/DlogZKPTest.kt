@@ -4,7 +4,7 @@ import de.polyas.core3.crypto.elgamal.CyclicGroup
 import de.polyas.core3.crypto.elgamal.VerificationResult
 import de.polyas.core3.crypto.elgamal.instance.SchnorrGroup
 import de.polyas.core3.crypto.elgamal.instance.EllipticCurveInst
-import de.polyas.core3.crypto.std.GuardedSRNG
+import de.polyas.core3.crypto.std.SRNG
 import de.polyas.core3.crypto.std.uniformHash
 import java.math.BigInteger
 import kotlin.test.Test
@@ -23,7 +23,7 @@ class DlogZKPTest {
 
     private fun <GroupElem> testBasic(group: CyclicGroup<GroupElem>) {
         // take a secret x and compute a statement X
-        val x = GuardedSRNG.nextBigInt(group.order)
+        val x = SRNG.nextBigInt(group.order)
         val X = group.powerOfG(x)
 
         // create a ZKP
@@ -58,7 +58,7 @@ class DlogZKPTest {
                 digest(group.asBytes(X))
             }
         }
-        val x = GuardedSRNG.nextBigIntInRange(BigInteger.ZERO, group.order)
+        val x = SRNG.nextBigIntInRange(BigInteger.ZERO, group.order)
         val X = group.powerOfG(x)
         val proof = dlogZKP.createProof(X, x)
         assertTrue(dlogZKP.verify(X, proof) is VerificationResult.Correct)

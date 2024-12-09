@@ -41,7 +41,7 @@ fun SymmetricKey.encryptStreamToStream(inputStream: InputStream, outputStream: O
  */
 fun SecretKey.encryptStreamToStream(inputStream: InputStream, outputStream: OutputStream) {
     val iv = ByteArray(StreamEncryption.IV_LEN)
-    GuardedSRNG.nextBytes(iv)
+    SRNG.nextBytes(iv)
     val c = Cipher.getInstance("AES/CTR/NoPadding")
     val spec = IvParameterSpec(iv)
     c.init(Cipher.ENCRYPT_MODE, this, spec)
@@ -95,7 +95,7 @@ fun InputStream.encrypt(key: SecretKey): InputStream {
     }
 
     val iv = ByteArray(StreamEncryption.IV_LEN)
-    GuardedSRNG.nextBytes(iv)
+    SRNG.nextBytes(iv)
     val c = Cipher.getInstance("AES/CTR/NoPadding")
     val spec = IvParameterSpec(iv)
     c.init(Cipher.ENCRYPT_MODE, key, spec)

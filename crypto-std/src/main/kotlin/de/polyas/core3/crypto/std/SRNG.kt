@@ -28,7 +28,7 @@ import java.util.concurrent.atomic.AtomicLong
  * test cases for testing interoperability of different implementations.
  * **This instrumentation is not intended for production use.**
  */
-object GuardedSRNG {
+object SRNG {
     private val random : Random = SecureRandom.getInstanceStrong() // the Random which backs this object
     private val beginUse = AtomicLong(0L)
     private val endUse = AtomicLong(0L)

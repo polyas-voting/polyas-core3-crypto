@@ -2,7 +2,7 @@ package de.polyas.core3.crypto.elgamal
 
 import de.polyas.core3.crypto.elgamal.instance.ECElement
 import de.polyas.core3.crypto.elgamal.instance.EllipticCurveInst
-import de.polyas.core3.crypto.std.GuardedSRNG
+import de.polyas.core3.crypto.std.SRNG
 import de.polyas.core3.crypto.std.Hashes.sha256
 import de.polyas.core3.crypto.std.Message
 import de.polyas.core3.crypto.std.SymmetricKey
@@ -18,13 +18,13 @@ object ECIES {
     private val order = group.order
 
     fun freshSecretKey(): BigInteger =
-        GuardedSRNG.nextBigInt(order)
+        SRNG.nextBigInt(order)
 
     fun derivePublicKey(secretKey: BigInteger): ECElement =
         group.powerOfG(secretKey)
 
     fun encrypt(publicKey: ECElement, message: Message): Message = with (group) {
-        val y = GuardedSRNG.nextBigInt(order)
+        val y = SRNG.nextBigInt(order)
         val Y = generator pow y
         val Z = publicKey pow y
         val symKey = deriveSymmetricKey(Y, Z, publicKey)

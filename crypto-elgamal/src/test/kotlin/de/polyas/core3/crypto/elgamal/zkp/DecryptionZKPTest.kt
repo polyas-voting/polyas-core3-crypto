@@ -7,7 +7,7 @@ import de.polyas.core3.crypto.elgamal.VerificationResult
 import de.polyas.core3.crypto.elgamal.instance.ECElement
 import de.polyas.core3.crypto.elgamal.instance.SchnorrGroup
 import de.polyas.core3.crypto.elgamal.instance.EllipticCurveInst
-import de.polyas.core3.crypto.std.GuardedSRNG
+import de.polyas.core3.crypto.std.SRNG
 import java.math.BigInteger
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -28,7 +28,7 @@ class DecryptionZKPTest {
 
     private fun <GroupElem> testValid(group: CyclicGroup<GroupElem>) {
         val cryptosystem = Cryptosystem(group)
-        val privateKey = GuardedSRNG.nextBigInt(group.order)
+        val privateKey = SRNG.nextBigInt(group.order)
         val publicKey = group.powerOfG(privateKey)
         val plaintext = BigInteger.valueOf(117)
         val ciphertext = cryptosystem.encrypt(publicKey, plaintext)
@@ -61,7 +61,7 @@ class DecryptionZKPTest {
 
     private fun <GroupElem> testInvalid(group: CyclicGroup<GroupElem>) {
         with (group) {
-            val privateKey = GuardedSRNG.nextBigInt(order)
+            val privateKey = SRNG.nextBigInt(order)
             val publicKey = powerOfG(privateKey)
             val plaintext = BigInteger.valueOf(117)
             val ciphertext = Cryptosystem(group).encrypt(publicKey, plaintext)

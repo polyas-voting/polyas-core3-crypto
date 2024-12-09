@@ -1,6 +1,6 @@
 package de.polyas.core3.crypto.elgamal.shuffle.wikstroem
 
-import de.polyas.core3.crypto.std.GuardedSRNG
+import de.polyas.core3.crypto.std.SRNG
 import java.util.*
 
 /**
@@ -43,7 +43,7 @@ class Permutation(
         private fun randomPermutationAsArray(N: Int): IntArray {
             val I = IntArray(N) { i -> i }
             val J = IntArray(N) // all zeros
-            GuardedSRNG.use { rnd: Random ->
+            SRNG.use { rnd: Random ->
                 for (i in 0 until N) { //i in <0,...,N-1>
                     val k = rnd.nextInt(N - i) + i //k in <i,...,N-1>
                     J[i] = I[k]

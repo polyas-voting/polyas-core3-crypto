@@ -2,7 +2,7 @@ package de.polyas.core3.crypto.elgamal
 
 import de.polyas.core3.crypto.elgamal.instance.SchnorrGroup
 import de.polyas.core3.crypto.elgamal.instance.EllipticCurveInst
-import de.polyas.core3.crypto.std.GuardedSRNG
+import de.polyas.core3.crypto.std.SRNG
 import java.math.BigInteger
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -23,7 +23,7 @@ class CryptosystemTest {
     }
 
     private fun <G> testEncrypt(ctx: Ctx<G>) {
-        val plaintext = GuardedSRNG.nextBigInt(ctx.group.messageUpperBound())
+        val plaintext = SRNG.nextBigInt(ctx.group.messageUpperBound())
         val encrypted = ctx.cs.encrypt(ctx.pk, plaintext)
         val decrypted = ctx.cs.decrypt(ctx.sk, encrypted)
         assertEquals(plaintext, decrypted)
@@ -51,7 +51,7 @@ class CryptosystemTest {
     private fun <G> testRerandomize(ctx: Ctx<G>) {
         val e = ctx.group.elementsFromSeed(1, "abc9876")[0]
         val encrypted = ctx.cs.encryptGroupElement(ctx.pk, e)
-        val reEncryptionCoin = GuardedSRNG.nextBigInt(ctx.group.order)
+        val reEncryptionCoin = SRNG.nextBigInt(ctx.group.order)
 
         // re-encryption with zero re-encryption coin
         val reEncrypted0 = ctx.cs.reRandomize(encrypted, ctx.pk, BigInteger.ZERO)

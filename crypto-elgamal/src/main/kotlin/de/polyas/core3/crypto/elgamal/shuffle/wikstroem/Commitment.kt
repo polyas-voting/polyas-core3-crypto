@@ -2,7 +2,7 @@ package de.polyas.core3.crypto.elgamal.shuffle.wikstroem
 
 import de.polyas.core3.crypto.elgamal.CyclicGroup
 import de.polyas.core3.crypto.elgamal.MultiCommitmentKey
-import de.polyas.core3.crypto.std.GuardedSRNG
+import de.polyas.core3.crypto.std.SRNG
 import java.math.BigInteger
 
 /**
@@ -69,6 +69,6 @@ class Commitment<GroupElement> private constructor(
             }
 
         private fun random(upperBound: BigInteger): BigInteger =
-            GuardedSRNG.nextBigInt(upperBound)
+            SRNG.nextBigInt(upperBound)
     }
 }

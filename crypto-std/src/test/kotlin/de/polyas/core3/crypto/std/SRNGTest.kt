@@ -3,12 +3,12 @@ package de.polyas.core3.crypto.std
 import java.math.BigInteger
 import kotlin.test.*
 
-class GuardedSRNGTest {
+class SRNGTest {
 
     @Test
     fun `sampling bytes`() {
-        val bytes1 = GuardedSRNG.nextBytes(1000)
-        val bytes2 = GuardedSRNG.nextBytes(1000)
+        val bytes1 = SRNG.nextBytes(1000)
+        val bytes2 = SRNG.nextBytes(1000)
 
         assertEquals(1000, bytes1.size)
         assertFalse(bytes1 contentEquals bytes2)
@@ -16,8 +16,8 @@ class GuardedSRNGTest {
 
     @Test
     fun `sampling messages`() {
-        val message1 = GuardedSRNG.nextMessage(1000)
-        val message2 = GuardedSRNG.nextMessage(1000)
+        val message1 = SRNG.nextMessage(1000)
+        val message2 = SRNG.nextMessage(1000)
 
         assertEquals(1000, message1.length())
         assertNotEquals(message1, message2)
@@ -28,7 +28,7 @@ class GuardedSRNGTest {
         val upperBound = BigInteger.valueOf(710000000000000)
 
         repeat (1000) {
-            val sampled = GuardedSRNG.nextBigInt(upperBound)
+            val sampled = SRNG.nextBigInt(upperBound)
             assertTrue(sampled >= BigInteger.ZERO)
             assertTrue(sampled < upperBound)
         }
@@ -40,7 +40,7 @@ class GuardedSRNGTest {
         val upperBound = BigInteger.valueOf(710000000000000)
 
         repeat (1000) {
-            val sampled = GuardedSRNG.nextBigIntInRange(lowerBound, upperBound)
+            val sampled = SRNG.nextBigIntInRange(lowerBound, upperBound)
             assertTrue(sampled >= lowerBound)
             assertTrue(sampled < upperBound)
         }
@@ -48,13 +48,13 @@ class GuardedSRNGTest {
 
     @Test
     fun `begin and end counters`() {
-        val end1 = GuardedSRNG.endCount()
-        val begin1 = GuardedSRNG.beginCount()
+        val end1 = SRNG.endCount()
+        val begin1 = SRNG.beginCount()
         assertTrue(begin1 >= end1)
 
-        GuardedSRNG.nextMessage(1000)
-        val end2 = GuardedSRNG.endCount()
-        val begin2 = GuardedSRNG.beginCount()
+        SRNG.nextMessage(1000)
+        val end2 = SRNG.endCount()
+        val begin2 = SRNG.beginCount()
         assertTrue(begin2 >= end2)
         assertTrue(begin1 <= begin2) // one might expect the difference to be 1, but it can be bigger if tests run in parallel
         assertTrue(end1 <= end2)
@@ -63,9 +63,9 @@ class GuardedSRNGTest {
 
     @Test
     fun `begin and end counters inside use`() {
-        GuardedSRNG.use {
-            val end = GuardedSRNG.endCount()
-            val begin = GuardedSRNG.beginCount()
+        SRNG.use {
+            val end = SRNG.endCount()
+            val begin = SRNG.beginCount()
             assertTrue(begin > end)
         }
     }
@@ -75,7 +75,7 @@ class GuardedSRNGTest {
         val upperBound = BigInteger.valueOf(710000000000000)
         data class Event(val modulus: BigInteger, val value: BigInteger)
         val events = mutableListOf<Event>()
-        val myInterceptor = object : GuardedSRNG.Interceptor {
+        val myInterceptor = object : SRNG.Interceptor {
             override fun bytes(bytes: ByteArray) { }
             override fun other() { }
             override fun bi(modulus: BigInteger, value: BigInteger) {
@@ -83,9 +83,9 @@ class GuardedSRNGTest {
             }
         }
 
-        GuardedSRNG.setInterceptor(myInterceptor)
-        val sampled = GuardedSRNG.nextBigInt(upperBound)
-        GuardedSRNG.resetInterceptor()
+        SRNG.setInterceptor(myInterceptor)
+        val sampled = SRNG.nextBigInt(upperBound)
+        SRNG.resetInterceptor()
 
         val expectedEvent = Event(upperBound, sampled)
         assertTrue(expectedEvent in events)

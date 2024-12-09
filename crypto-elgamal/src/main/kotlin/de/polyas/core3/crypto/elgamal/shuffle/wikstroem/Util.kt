@@ -3,7 +3,7 @@ package de.polyas.core3.crypto.elgamal.shuffle.wikstroem
 import de.polyas.core3.crypto.elgamal.CyclicGroup
 import de.polyas.core3.crypto.elgamal.MultiCiphertext
 import de.polyas.core3.crypto.elgamal.MultiCommitmentKey
-import de.polyas.core3.crypto.std.GuardedSRNG
+import de.polyas.core3.crypto.std.SRNG
 import de.polyas.core3.crypto.std.PartialDigest
 import de.polyas.core3.crypto.std.initialDigestSha512
 import java.math.BigInteger
@@ -15,7 +15,7 @@ import kotlin.streams.asSequence
 * Returns a random biginteger in range [2, upperbound).
 */
 internal fun randomFrom2To(upperBound: BigInteger): BigInteger =
-    GuardedSRNG.nextBigIntInRange(BigInteger.TWO, upperBound)
+    SRNG.nextBigIntInRange(BigInteger.TWO, upperBound)
 
 /**
  * Sums this sequence of big integers modulo the given [modulus].

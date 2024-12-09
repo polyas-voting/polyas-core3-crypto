@@ -3,7 +3,7 @@ package de.polyas.core3.crypto.elgamal.zkp
 import com.fasterxml.jackson.annotation.JsonProperty
 import de.polyas.core3.crypto.elgamal.CyclicGroup
 import de.polyas.core3.crypto.elgamal.VerificationResult
-import de.polyas.core3.crypto.std.GuardedSRNG
+import de.polyas.core3.crypto.std.SRNG
 import java.math.BigInteger
 
 /**
@@ -40,7 +40,7 @@ object EqlogZKP {
         /**
          * The blinding factor, sampled at random on this instance creation.
          */
-        private val a: BigInteger = GuardedSRNG.nextBigInt(group.order)
+        private val a: BigInteger = SRNG.nextBigInt(group.order)
 
         /**
          * The initial message (derived from the blinding factor [a]).
@@ -63,7 +63,7 @@ object EqlogZKP {
         /**
          * Returns a (random) challenge.
          */
-        fun challenge(): BigInteger = GuardedSRNG.nextBigInt(group.order)
+        fun challenge(): BigInteger = SRNG.nextBigInt(group.order)
 
         /**
          * Verifies validity of the ZKP for the obtained before initial message and

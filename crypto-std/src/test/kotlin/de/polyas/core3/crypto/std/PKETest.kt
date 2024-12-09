@@ -10,7 +10,7 @@ import kotlin.test.assertTrue
 class PKETest {
     @Test
     fun `encryption-decryption`() {
-        val plaintext = GuardedSRNG.nextMessage(8)
+        val plaintext = SRNG.nextMessage(8)
         val keyPair = EncryptionKeyPair.generate()
         val encrypted = keyPair.encryptionKey.encrypt(plaintext)
         val decrypted = keyPair.decryptionKey.decrypt(encrypted).getOrThrow()
@@ -19,7 +19,7 @@ class PKETest {
 
     @Test
     fun `hybrid encryption-decryption`() {
-        val plaintext = GuardedSRNG.nextMessage(1000000)
+        val plaintext = SRNG.nextMessage(1000000)
         val keyPair = EncryptionKeyPair.generate()
         val encrypted = keyPair.encryptionKey.hybridEnc(plaintext)
         val decrypted = keyPair.decryptionKey.hybridDec(encrypted).getOrThrow()
@@ -43,7 +43,7 @@ class PKETest {
 
     @Test
     fun `hybrid encryption fails on invalid ciphertext`() {
-        val plaintext = GuardedSRNG.nextMessage(1000000)
+        val plaintext = SRNG.nextMessage(1000000)
         val keyPair = EncryptionKeyPair.generate()
         val encrypted = keyPair.encryptionKey.hybridEnc(plaintext)
         val invalidCiphertext = buildMessage { put(encrypted); putByte(23) }
