@@ -74,6 +74,18 @@
                     </execution>
                 </executions>
             </plugin>
+            <plugin>
+                <groupId>com.amashchenko.maven.plugin</groupId>
+                <artifactId>gitflow-maven-plugin</artifactId>
+                <version>1.21.0</version>
+                <configuration>
+                    <versionDigitToIncrement>1</versionDigitToIncrement>
+                    <gitFlowConfig>
+                        <productionBranch>trunk</productionBranch>
+                        <developmentBranch>trunk</developmentBranch>
+                    </gitFlowConfig>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
 
