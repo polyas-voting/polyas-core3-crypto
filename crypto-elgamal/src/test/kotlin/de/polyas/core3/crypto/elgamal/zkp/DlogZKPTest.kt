@@ -63,15 +63,4 @@ class DlogZKPTest {
         val proof = dlogZKP.createProof(X, x)
         assertTrue(dlogZKP.verify(X, proof) is VerificationResult.Correct)
     }
-
-    companion object {
-        fun log(format: String, vararg args: Any?) {
-            System.out.printf(
-                """
-                $format
-    
-                """.trimIndent(), *args
-            )
-        }
-    }
 }
