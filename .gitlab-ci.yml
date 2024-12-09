@@ -17,5 +17,6 @@ deploy:
   extends: .maven-deploy
   only:
     refs:
+      - tags
       - trunk
       - draft
