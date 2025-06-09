@@ -100,8 +100,8 @@
                         <releaseVersionUpdateMessage>bump the version to @{version}</releaseVersionUpdateMessage>
                     </commitMessages>
                     <gitFlowConfig>
-                        <productionBranch>draft</productionBranch>
-                        <developmentBranch>draft</developmentBranch>
+                        <productionBranch>main</productionBranch>
+                        <developmentBranch>main</developmentBranch>
                     </gitFlowConfig>
                 </configuration>
             </plugin>
