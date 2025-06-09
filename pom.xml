@@ -6,7 +6,7 @@
 
     <groupId>de.polyas.core3</groupId>
     <artifactId>crypto</artifactId>
-    <version>0.9.5-SNAPSHOT</version>
+    <version>1.1.0</version>
     <packaging>pom</packaging>
 
     <modules>
