@@ -10,7 +10,7 @@ build:
       - branches
   except:
     refs:
-      - trunk
+      - main
 
 deploy:
   extends: .maven-deploy
