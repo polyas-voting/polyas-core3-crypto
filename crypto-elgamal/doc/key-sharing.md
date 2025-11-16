@@ -19,55 +19,55 @@ polynomial coefficients).
  1. **Polynomial generation.**
     Each teller $k$ generates a random polynomial of order $t-1$, where
     $a_{k,i} \in \mathbb{Z}_q$:
-    \[
+    $$
         p_k(x) = a_{k,0} + a_{k,1} x + \cdots + a_{k,t-1}x^{t-1}
         \tag{DKG.1}
-    \]
+    $$
     and publishes its **coefficient commitments**
-    \[
+    $$
         A_{k, i} = g ^{a_{k,i}}  \qquad (i = 0, \dots, t-1)
         \tag{DKG.2}
-    \]
+    $$
     along with non-interactive zero-knowledge proof of knowledge of
     $a_{k,i}$.
 
     The **public key** is determined by the published commitmets $A_{k,0}$ as:
-    \[
+    $$
         Y_0 = \prod_{k\in I} A_{k,0} 
         \tag{DKG.3}
-    \]
+    $$
     with the corresponding **secret key** $y_0 = \sum_{k \in I} a_{k,0} = p(0)$, where
     $p(x) = \sum_{k \in I} p_k(x)$.
 
  3. **Sharing.**
     Each teller $k$ shares the following data with each other teller $l$:
-    \[
+    $$
         y_{k,l} = p_k(l)
         \tag{DKG.4}
-    \]
+    $$
 
     Teller $l$ checks the zero-knowledge proofs for the commitments published
     in step (DKG.2) and verifies the data received from teller $k$, by
     checking the equation
-    \[
+    $$
         g^{y_{k,l}} = \prod_{i \in T} (A_{k,i})^{l^i}
         \tag{DKG.5}
-    \]
+    $$
 
     > **Note.** This check verifies that (DKG.4) is consistent with the
     > commitments of teller $k$ published in (DKG.2), by evaluating $p_k(l)$
     > "in the exponent".
 
     If these checks succeed, the teller computes its **secret key share**:
-    \[
+    $$
         y_l = \sum_{k \in I} y_{k,l} \mod{q}
         \tag{DKG.6}
-    \]
+    $$
     and the corresponding value
-    \[
+    $$
         Y_l = g^{y_l}. 
         \tag{DKG.7}
-    \]
+    $$
 
     > **Note.** We expect $y_l = p(l)$ and hence $Y_l = g^{p(l)}$.
 
@@ -78,26 +78,26 @@ of size $d \geq t$. To decrypt a ciphertext $(\alpha, \beta)$, one needs to
 compute $\alpha^{y_0}$ (recall that $y_0$ is the private key). This is jointly
 done by the tellers in $D$ as follows. Each teller $l$ computes and publishes
 it's decryption share
-\[
+$$
     \bar\alpha_l = \alpha^{y_l}
     \tag{VDD.1}
-\]
+$$
 along with a zero-knowledge proof of knowledge of $y_l$ which
 simultaneously satisfies (VDD.1) and (DKG.7). 
 For checking this zero-knowledge proof, one computes $Y_l$ from the 
 published coefficient commitments by
-\[
+$$
     Y_l = \prod_{k \in I, i \in T} (A_{k,i})^{l^i} \qquad
     \tag{VDD.2}
-\]
+$$
 
 The decryption is finalized by computing:
-\[
+$$
     \alpha^{y_0} = \prod_{k \in D}  (\bar\alpha_k)^{\ell^0_k}
     \qquad\text{with}\quad
     \ell^0_k = \prod_{m \in D\setminus\{k\}} \frac{m}{m - k}
     \tag{VDD.3}
-\]
+$$
 
 
 > **Note**.
