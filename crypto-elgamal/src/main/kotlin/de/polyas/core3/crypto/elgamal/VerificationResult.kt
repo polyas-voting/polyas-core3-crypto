@@ -30,3 +30,6 @@ sealed class VerificationResult {
             if (condition) Correct else Failed(message())
     }
 }
+
+fun VerificationResult.Failed.mapErrorMessage(newMessage: (oldMessage:String) -> String) =
+    VerificationResult.Failed(newMessage(this.errorMessage))

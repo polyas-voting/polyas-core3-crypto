@@ -11,15 +11,14 @@ package de.polyas.core3.crypto.elgamal.threshold
 
 import de.polyas.core3.crypto.elgamal.*
 import de.polyas.core3.crypto.elgamal.threshold.Polynomial.Companion.random
+import de.polyas.core3.crypto.elgamal.zkp.DlogNIZKP
 import de.polyas.core3.crypto.elgamal.zkp.EqlogNIZKP
 import de.polyas.core3.crypto.elgamal.zkp.EqlogZKP
 import java.math.BigInteger
 
 /**
- * Threshold decryption. Provides methods for (distributed) key generation (via
+ * Threshold decryption. Provides methods for distributed key generation (via
  * the inner class KeyGen) and for using and combining public and private key shares.
- *
- * Our implementation follows [https://eprint.iacr.org/2004/119.pdf](https://eprint.iacr.org/2004/119.pdf)
  *
  * In the protocol, each teller distributes its share of the secret with the others through a
  * Feldman VSS scheme (as referenced above). In our implementation, if any of
@@ -221,6 +220,24 @@ class ThresholdDecryption<GroupElem>(
         val blindedCoefficients: List<GroupElem> = polynomial.blindPolynomial(group)
 
         /**
+         * Non-interactive zero-knowledge proofs of knowledge of the discrete logarithms of the [blindedCoefficients]
+         * (which are the coefficients of the [polynomial]).
+         */
+        val pkCoefficients: List<DlogNIZKP.Proof> = proofsOfKnowledgeOfCoefficient()
+
+        private fun proofsOfKnowledgeOfCoefficient(): List<DlogNIZKP.Proof> {
+            val coefficients = polynomial.coefficients
+            require(coefficients.size == blindedCoefficients.size)
+                { "Incorrect number of coefficient commitments: ${coefficients}; expected is ${blindedCoefficients.size}" }
+
+            val dlogNIZKP = DlogNIZKP(group)
+
+            return coefficients.indices.map { i ->
+                dlogNIZKP.createProof(blindedCoefficients[i], coefficients[i])
+            }
+        }
+
+        /**
          * The value of the polynomial of this teller at the point i. This value is
          * meant to be sent (using a confidential channel) to the i-th teller.
          */
@@ -232,7 +249,8 @@ class ThresholdDecryption<GroupElem>(
          * meant for the i-th teller) and the blinded coefficients (which is public
          * information).
          */
-        fun dataSharedWith(i: Int): KeyGenSharedData<GroupElem> = KeyGenSharedData(nr, polynomialAt(i), blindedCoefficients)
+        fun dataSharedWith(i: Int): KeyGenSharedData<GroupElem> =
+            KeyGenSharedData(nr, polynomialAt(i), blindedCoefficients, pkCoefficients)
 
         /**
          * Accepts data produced by the remaining tellers and either reports an error
@@ -243,6 +261,7 @@ class ThresholdDecryption<GroupElem>(
          * list of records shared by all the remaining tellers
          */
         fun finalize(sharedData: List<KeyGenSharedData<GroupElem>>): FinalisationResult<GroupElem> {
+            proofsCorrect(sharedData) onFailure { return FinalisationResult.Error(it.errorMessage) }
             sharesCorrect(sharedData) onFailure { return FinalisationResult.Error(it.errorMessage) }
             return FinalisationResult.Success(computeKeyShare(sharedData))
         }
@@ -256,6 +275,20 @@ class ThresholdDecryption<GroupElem>(
                 .mod(group.order) // modulo the group order
             val pk = group.powerOfG(sk) // the public key share
             return PrivateKeyShare(nr, sk, pk)
+        }
+
+        private fun proofsCorrect(sharedData: List<KeyGenSharedData<GroupElem>>): VerificationResult {
+            val dlogNIZKP = DlogNIZKP(group)
+            for (data in sharedData) {
+                VerificationResult.expect(data.blindedCoefficients.size != data.pkCoefficients.size) {
+                    "The number of coefficient commitments doest not match the number of proofs in data from ${data.producer}"
+                }
+                for (i in data.blindedCoefficients.indices) {
+                    dlogNIZKP.verify(data.blindedCoefficients[i], data.pkCoefficients[i])
+                        .onFailure { return it.mapErrorMessage { msg -> "Wrong data from ${data.producer}: $msg" } }
+                }
+            }
+            return VerificationResult.Correct
         }
 
         private fun sharesCorrect(sharedData: List<KeyGenSharedData<GroupElem>>): VerificationResult {
