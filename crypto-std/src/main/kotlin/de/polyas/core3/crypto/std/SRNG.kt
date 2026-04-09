@@ -121,12 +121,13 @@ object SRNG {
     }
 
     private fun nextBigIntImpl(modulus: BigInteger): BigInteger {
-        while (true) {
+        repeat(1000) {
             val i = lend { r: Random? -> BigInteger(modulus.bitLength(), r) }
             if (i < modulus) {
                 return i
             }
         }
+        error("Failed to generate random BigInteger after 1000 attempts - possible RNG failure")
     }
 
     private fun <T> lend(userOfRandom: (Random) -> T): T {
