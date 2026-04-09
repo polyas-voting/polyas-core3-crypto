@@ -180,13 +180,13 @@ class ThresholdDecryption<GroupElem>(
     private fun lagrange(servernumbers: Collection<Int>, j: Int): BigInteger {
         val numerator = servernumbers.asSequence()
             .filter { l -> l != j }
-            .map { l -> l.toLong() }
-            .fold(1L) { x, y -> x * y }
+            .map { l -> BigInteger.valueOf(l.toLong()) }
+            .fold(BigInteger.ONE) { x, y -> x * y }
         val denominator = servernumbers.asSequence()
             .filter { l -> l != j }
-            .map { l -> (l - j).toLong() }
-            .fold(1L) { x, y -> x * y }
-        return (BigInteger.valueOf(numerator) * BigInteger.valueOf(denominator).modInverse(order)).mod(order)
+            .map { l -> BigInteger.valueOf((l - j).toLong()) }
+            .fold(BigInteger.ONE) { x, y -> x * y }
+        return (numerator * denominator.modInverse(order)).mod(order)
     }
 
     /**
