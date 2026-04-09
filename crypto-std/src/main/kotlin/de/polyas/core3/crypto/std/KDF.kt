@@ -77,7 +77,7 @@ object KDF {
     ) {
         val sha512Hmac = initializeMac(seed)
         var resultIndex = 0
-        var blockIndex = 0
+        var blockIndex = 0  // Note: In the NIST spec, counter starts at 1. Possible incompatibility, but not security relevant
         while (resultIndex < targetByteLength) {
             val nextBlock = block(sha512Hmac, blockIndex, context, label, targetByteLength)
             var j = 0
