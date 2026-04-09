@@ -117,6 +117,9 @@ class SigningKey(
 
     override fun hashCode(): Int =
         privateKeyBytes.contentHashCode()
+
+    override fun toString(): String =
+        "SigningKey(algorithm=RSA, keySize=${privateKeyBytes.size * 8} bits)"
 }
 
 sealed interface SignatureVerificationResult {

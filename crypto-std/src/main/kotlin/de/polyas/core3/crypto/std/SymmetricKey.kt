@@ -118,6 +118,9 @@ class SymmetricKey {
 
     fun underlyingKey(): SecretKey = key
 
+    override fun toString(): String =
+        "SymmetricKey(algorithm=AES, keySize=$KEY_SIZE bits)"
+
     companion object {
         const val GCM_TAG_LENGTH = 16 // in bytes
         const val KEY_SIZE = 256

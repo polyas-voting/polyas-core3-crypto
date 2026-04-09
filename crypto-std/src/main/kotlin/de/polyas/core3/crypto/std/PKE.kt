@@ -149,4 +149,7 @@ class DecryptionKey(private val keyAsBytes: ByteArray) {
 
     override fun hashCode(): Int =
         keyAsBytes.contentHashCode()
+
+    override fun toString(): String =
+        "DecryptionKey(algorithm=RSA, keySize=${keyAsBytes.size * 8} bits)"
 }
