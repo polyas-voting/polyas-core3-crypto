@@ -127,10 +127,10 @@ class Shuffle<GroupElement>(
         }
 
         // Line 15 Alg. 4.3
-        val omega = List(3) { i -> randomFrom2To(q) }
-        val omegaFour = List(w) { i -> randomFrom2To(q) }
-        val omegaHat = List(N) { i -> randomFrom2To(q) }
-        val omegaPrime = List(N) { i -> randomFrom2To(q) }
+        val omega = List(3) { randomFrom2To(q) }
+        val omegaFour = List(w) { randomFrom2To(q) }
+        val omegaHat = List(N) { randomFrom2To(q) }
+        val omegaPrime = List(N) { randomFrom2To(q) }
         val t1 = h pow omega[0]
         val t2 = h pow omega[1]
         val t3 = (h pow omega[2]) * productPar(N) { i -> hi[i] pow omegaPrime[i] }
@@ -183,26 +183,10 @@ class Shuffle<GroupElement>(
         ic: List<MultiCiphertext<GroupElement>>,
         oc: List<MultiCiphertext<GroupElement>>
     ): VerificationResult {
-        // Initial checks and definitions
-        val N = ic.size
-        VerificationResult
-            .expect (ic.size == oc.size) { "The number of input and output ciphertexts is not the same: ${ic.size} ${oc.size}" }
-            .andExpect ( N > 0) { "A mixing packet cannot be empty" }
-            .andExpect (proof.c.size == N) { "Wrong size of proof.c" }
-            .andExpect (proof.cHat.size == N) { "Wrong size of proof.cHat"}
-            .onFailure { return it }
-        val w = ic[0].size()
-        VerificationResult
-            .expect (ic.all { it.size() == w }) { "Input ciphertexts of various sizes" }
-            .andExpect (oc.all { it.size() == w }) { "Output ciphertexts of various sizes" }
-            .andExpect (proof.t.t4y.size == w) { "Wrong size of proof.t.t4y" }
-            .andExpect (proof.t.t4x.size == w) { "Wrong size of proof.t.t4x" }
-            .andExpect (proof.t.tHat.size == N) { "Wrong size of proof.t.tHat" }
-            .andExpect (proof.s.s4.size == w) { "Wrong size of proof.s4" }
-            .andExpect (proof.s.sHat.size == N) { "Wrong size of proof.s.sHat"}
-            .andExpect (proof.s.sPrime.size == N) { "Wrong size of proof.sPrime" }
-            .onFailure { return it }
+        validateInput(proof, ic, oc) onFailure { return it }
 
+        val N = ic.size
+        val w = ic[0].size()
         val q = group.order
         val hi = ck.hs
         val h = ck.h
@@ -257,4 +241,60 @@ class Shuffle<GroupElement>(
             else -> Correct
         }
     }
+
+    private fun validateInput(
+        proof: ShuffleZKProof<GroupElement>,
+        ic: List<MultiCiphertext<GroupElement>>,
+        oc: List<MultiCiphertext<GroupElement>>
+    ): VerificationResult =
+        with(group) {
+            val N = ic.size
+            // Validate sizes
+            VerificationResult
+                .expect (ic.size == oc.size) { "The number of input and output ciphertexts is not the same: ${ic.size} ${oc.size}" }
+                .andExpect (N > 0) { "A mixing packet cannot be empty" }
+                .andExpect (proof.c.size == N) { "Wrong size of proof.c" }
+                .andExpect (proof.cHat.size == N) { "Wrong size of proof.cHat" }
+                .onFailure { return@with it }
+            val w = ic[0].size()
+            VerificationResult
+                .expect (ic.all { it.size() == w }) { "Input ciphertexts of various sizes" }
+                .andExpect (oc.all { it.size() == w }) { "Output ciphertexts of various sizes" }
+                .andExpect (proof.t.t4y.size == w) { "Wrong size of proof.t.t4y" }
+                .andExpect (proof.t.t4x.size == w) { "Wrong size of proof.t.t4x" }
+                .andExpect (proof.t.tHat.size == N) { "Wrong size of proof.t.tHat" }
+                .andExpect (proof.s.s4.size == w) { "Wrong size of proof.s4" }
+                .andExpect (proof.s.sHat.size == N) { "Wrong size of proof.s.sHat" }
+                .andExpect (proof.s.sPrime.size == N) { "Wrong size of proof.sPrime" }
+                .onFailure { return@with it }
+
+            // Validate input element domains
+            VerificationResult
+                .expect(ic.all { mc -> mc.ciphertexts.all { validGroupElement(it.x) && validGroupElement(it.y) } })
+                    { "Shuffle: input ciphertext contains an invalid group element" }
+                .andExpect(oc.all { mc -> mc.ciphertexts.all { validGroupElement(it.x) && validGroupElement(it.y) } })
+                    { "Shuffle: output ciphertext contains an invalid group element" }
+                .andExpect(proof.c.all { validGroupElement(it) })
+                    { "Shuffle: proof.c contains an invalid group element" }
+                .andExpect(proof.cHat.all { validGroupElement(it) })
+                    { "Shuffle: proof.cHat contains an invalid group element" }
+                .andExpect(validGroupElement(proof.t.t1)) { "Shuffle: proof.t.t1 is not a valid group element" }
+                .andExpect(validGroupElement(proof.t.t2)) { "Shuffle: proof.t.t2 is not a valid group element" }
+                .andExpect(validGroupElement(proof.t.t3)) { "Shuffle: proof.t.t3 is not a valid group element" }
+                .andExpect(proof.t.t4y.all { validGroupElement(it) })
+                    { "Shuffle: proof.t.t4y contains an invalid group element" }
+                .andExpect(proof.t.t4x.all { validGroupElement(it) })
+                    { "Shuffle: proof.t.t4x contains an invalid group element" }
+                .andExpect(proof.t.tHat.all { validGroupElement(it) })
+                    { "Shuffle: proof.t.tHat contains an invalid group element" }
+                .andExpect(proof.s.s1.isValidExponent()) { "Shuffle: proof.s.s1 is out of range" }
+                .andExpect(proof.s.s2.isValidExponent()) { "Shuffle: proof.s.s2 is out of range" }
+                .andExpect(proof.s.s3.isValidExponent()) { "Shuffle: proof.s.s3 is out of range" }
+                .andExpect(proof.s.s4.all { it.isValidExponent() })
+                    { "Shuffle: proof.s.s4 contains an out-of-range exponent" }
+                .andExpect(proof.s.sHat.all { it.isValidExponent() })
+                    { "Shuffle: proof.s.sHat contains an out-of-range exponent" }
+                .andExpect(proof.s.sPrime.all { it.isValidExponent() })
+                    { "Shuffle: proof.s.sPrime contains an out-of-range exponent" }
+        }
 }

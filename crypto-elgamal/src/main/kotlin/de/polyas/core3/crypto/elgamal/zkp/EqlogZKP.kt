@@ -84,6 +84,8 @@ object EqlogZKP {
             finalMsg: BigInteger
         ): VerificationResult =
             with(group) {
+                validateInput(initialMsg, challenge, finalMsg) onFailure { return@with it }
+
                 val expectedA = (statement.baseX pow finalMsg) / statement.X.pow(challenge)
                 val expectedB = (statement.baseY pow finalMsg) / (statement.Y pow challenge)
 
@@ -92,6 +94,23 @@ object EqlogZKP {
                     (expectedB != initialMsg.B) -> VerificationResult.Failed("EqLogZKP: B has invalid value")
                     else -> VerificationResult.Correct
                 }
+            }
+
+        /**
+         * Validates the inputs of the ZKP: checks that the initial message components
+         * are valid group elements and that the challenge and final message are valid exponents.
+         */
+        private fun validateInput(
+            initialMsg: InitialMessage<GroupElement>,
+            challenge: BigInteger,
+            finalMsg: BigInteger
+        ): VerificationResult =
+            with(group) {
+                VerificationResult
+                    .expect(validGroupElement(initialMsg.A)) { "EqLogZKP: A is not a valid group element" }
+                    .andExpect(validGroupElement(initialMsg.B)) { "EqLogZKP: B is not a valid group element" }
+                    .andExpect(challenge.isValidExponent()) { "EqLogZKP: challenge is out of range" }
+                    .andExpect(finalMsg.isValidExponent()) { "EqLogZKP: final message is out of range" }
             }
     }
 }

@@ -49,6 +49,7 @@ class DecryptionZKP<GroupElem>(private val group: CyclicGroup<GroupElem>, privat
      * Checks the given zero-knowledge [proof] showing that the given [ciphertext] decrypts to [plaintext].
      */
     fun verify(ciphertext: Ciphertext<GroupElem>, plaintext: BigInteger, proof: Proof<GroupElem>): VerificationResult {
+        validateInput(ciphertext, plaintext, proof) onFailure { return it }
         verifyZkpOnly(ciphertext, proof) onFailure { return it }
         return if (applyDecryptionFactor(ciphertext, proof.decryptionShare) == plaintext) VerificationResult.Correct
                else VerificationResult.Failed("The included decryption share does not yield the included plaintext")
@@ -62,6 +63,15 @@ class DecryptionZKP<GroupElem>(private val group: CyclicGroup<GroupElem>, privat
             statement = EqlogZKP.Statement(group.generator, ciphertext.x, publicKey, proof.decryptionShare),
             proof = proof.eqlogZKP
         )
+
+    private fun validateInput(ciphertext: Ciphertext<GroupElem>, plaintext: BigInteger, proof: Proof<GroupElem>): VerificationResult =
+        with(group) {
+            VerificationResult
+                .expect(validGroupElement(ciphertext.x)) { "DecryptionZKP: ciphertext.x is not a valid group element" }
+                .andExpect(validGroupElement(ciphertext.y)) { "DecryptionZKP: ciphertext.y is not a valid group element" }
+                .andExpect(validPlaintext(plaintext)) { "DecryptionZKP: plaintext is out of range" }
+                .andExpect(validGroupElement(proof.decryptionShare)) { "DecryptionZKP: decryption share is not a valid group element" }
+        }
 
     /**
      * Applies the decryption factor to the ciphertext to obtain the decrypted (plaintext) message.

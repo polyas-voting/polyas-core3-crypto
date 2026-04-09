@@ -40,6 +40,8 @@ class EqlogNIZKP<GroupElement>(val group: CyclicGroup<GroupElement>) {
 
     fun verify(statement: EqlogZKP.Statement<GroupElement>, proof: Proof): VerificationResult =
         with(group) {
+            validateInput(statement, proof) onFailure { return@with it }
+
             val expectedA = (statement.baseX pow proof.f) / (statement.X pow proof.c)
             val expectedB = (statement.baseY pow proof.f) / (statement.Y pow proof.c)
 
@@ -47,6 +49,17 @@ class EqlogNIZKP<GroupElement>(val group: CyclicGroup<GroupElement>) {
                 proof.c -> VerificationResult.Correct
                 else -> VerificationResult.Failed("The NIZKP of equality of discrete logarithms is incorrect")
             }
+        }
+
+    private fun validateInput(statement: EqlogZKP.Statement<GroupElement>, proof: Proof): VerificationResult =
+        with(group) {
+            VerificationResult
+                .expect(validGroupElement(statement.baseX)) { "EqLogNIZKP: baseX is not a valid group element" }
+                .andExpect(validGroupElement(statement.baseY)) { "EqLogNIZKP: baseY is not a valid group element" }
+                .andExpect(validGroupElement(statement.X)) { "EqLogNIZKP: X is not a valid group element" }
+                .andExpect(validGroupElement(statement.Y)) { "EqLogNIZKP: Y is not a valid group element" }
+                .andExpect(proof.c.isValidExponent()) { "EqLogNIZKP: challenge is out of range" }
+                .andExpect(proof.f.isValidExponent()) { "EqLogNIZKP: final message is out of range" }
         }
 
     private fun challenge(statement: EqlogZKP.Statement<GroupElement>, A: GroupElement, B:GroupElement) =

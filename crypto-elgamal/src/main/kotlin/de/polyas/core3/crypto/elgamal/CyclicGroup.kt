@@ -129,6 +129,12 @@ interface CyclicGroup<GroupElement> {
         this.asSequence().map(selector).fold(identity) { a: GroupElement, b: GroupElement -> a*b }
 
     /**
+     * Checks if this integer is in the range [0, order), i.e. it is a valid exponent for this group.
+     */
+    fun BigInteger.isValidExponent(): Boolean =
+        this >= BigInteger.ZERO && this < order
+
+    /**
      * Checks if the given integer is a valid plaintext, i.e. it is in the range [0, messageUpperBound)
      */
     fun validPlaintext(a: BigInteger): Boolean {

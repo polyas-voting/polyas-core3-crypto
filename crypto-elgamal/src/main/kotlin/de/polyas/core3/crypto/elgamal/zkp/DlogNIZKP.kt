@@ -12,7 +12,6 @@ package de.polyas.core3.crypto.elgamal.zkp
 import com.fasterxml.jackson.annotation.JsonProperty
 import de.polyas.core3.crypto.elgamal.CyclicGroup
 import de.polyas.core3.crypto.elgamal.VerificationResult
-import de.polyas.core3.crypto.elgamal.zkp.DlogNIZKP.Challenger
 import de.polyas.core3.crypto.std.uniformHash
 import de.polyas.core3.crypto.annotation.Doc
 import de.polyas.core3.crypto.std.SRNG
@@ -62,11 +61,21 @@ class DlogNIZKP<GroupElem>(
      */
     fun verify(X: GroupElem, proof: Proof): VerificationResult =
         with (group) {
+            validateInput(X, proof) onFailure { return it }
+
             val A = powerOfG(proof.f) / (X pow proof.c)
             val c = challenger.challenge(X, A)
 
             if (c == proof.c) VerificationResult.Correct
             else VerificationResult.Failed("ZKP of knowledge of discrete logarithms failed (the given challenge is not as expected)")
+        }
+
+    private fun validateInput(X: GroupElem, proof: Proof): VerificationResult =
+        with(group) {
+            VerificationResult
+                .expect(validGroupElement(X)) { "DlogNIZKP: X is not a valid group element" }
+                .andExpect(proof.c.isValidExponent()) { "DlogNIZKP: challenge is out of range" }
+                .andExpect(proof.f.isValidExponent()) { "DlogNIZKP: final message is out of range" }
         }
 
 
