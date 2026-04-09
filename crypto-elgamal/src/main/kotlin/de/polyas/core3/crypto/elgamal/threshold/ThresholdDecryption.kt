@@ -284,7 +284,7 @@ class ThresholdDecryption<GroupElem>(
                     "The number of coefficient commitments doest not match the number of proofs in data from ${data.producer}"
                 }
                 for (i in data.blindedCoefficients.indices) {
-                    dlogNIZKP.verify(data.blindedCoefficients[i], data.pkCoefficients[i])
+                    checkPkCoefficients(dlogNIZKP, data.blindedCoefficients[i], data.pkCoefficients[i])
                         .onFailure { return it.mapErrorMessage { msg -> "Wrong data from ${data.producer}: $msg" } }
                 }
             }
@@ -353,6 +353,14 @@ class ThresholdDecryption<GroupElem>(
         inline fun getOrElse(onError: (errorMessage:String) -> Nothing): PrivateKeyShare<G> = when (this) {
             is Success -> privateKeyShare
             is Error -> onError(errorMessage)
+        }
+    }
+
+    companion object {
+        fun <GroupElem> checkPkCoefficients(
+            dlogNIZKP: DlogNIZKP<GroupElem>, blindedCoefficient: GroupElem, pkCoefficient: DlogNIZKP.Proof
+        ): VerificationResult {
+            return dlogNIZKP.verify(blindedCoefficient, pkCoefficient)
         }
     }
 }
