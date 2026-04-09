@@ -62,7 +62,13 @@ class SymmetricKey {
 
     /**
      * Deterministically encrypts the given [plaintext] with this key,
-     * using the zero initialisation vector.
+     * using the zero initialization vector.
+     *
+     * **This function must be called at most once for each encryption key**.
+     * If called multiple times (for the same key but different payload),
+     * the security properties of encryption are broken. It is intended
+     * for use cases like ECIES/hybrid encryption, where, by construction,
+     * for each symmetric key it is called only once.
      */
     fun deterministicEncryption(plaintext: Message): Message =
         justEncrypt(plaintext, Message.fromBytes(zeroIv))
