@@ -17,7 +17,7 @@ import java.security.spec.PKCS8EncodedKeySpec
 import java.security.spec.X509EncodedKeySpec
 import javax.crypto.Cipher
 
-private const val DEFAULT_KEY_SIZE = 2048
+private const val DEFAULT_KEY_SIZE = 3072
 private val keyFactory = KeyFactory.getInstance("RSA")
 
 @Doc("A key pair for RSA encryption/decryption")
