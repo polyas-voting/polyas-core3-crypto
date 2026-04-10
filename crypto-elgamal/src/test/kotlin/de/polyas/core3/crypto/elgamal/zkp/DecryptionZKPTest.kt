@@ -44,7 +44,7 @@ class DecryptionZKPTest {
 
         // decrypt and produce a zkp of valid decryption
         val zkp = DecryptionZKP(group, publicKey)
-        val decryptAndProve = zkp.decryptAndProve(ciphertext, privateKey)
+        val decryptAndProve = zkp.decryptAndProve(ciphertext, privateKey)!!
         val decrypted = decryptAndProve.plaintext
         val proof = decryptAndProve.proof
 
@@ -77,7 +77,7 @@ class DecryptionZKPTest {
 
             // decrypt and produce a zkp of valid decryption
             val zkp = DecryptionZKP(group, publicKey)
-            val decryptAndProve = zkp.decryptAndProve(ciphertext, privateKey)
+            val decryptAndProve = zkp.decryptAndProve(ciphertext, privateKey)!!
             val decrypted = decryptAndProve.plaintext
             val proof = decryptAndProve.proof
             val modifiedX = ciphertext.x * generator

@@ -38,8 +38,11 @@ class DecryptionZKP<GroupElem>(private val group: CyclicGroup<GroupElem>, privat
 
     /**
      * Decrypts the given [ciphertext] and produces a zero-knowledge proof for this decryption.
+     *
+     * @return The decrypted plaintext with proof, or null if the ciphertext contains invalid group elements.
      */
-    fun decryptAndProve(ciphertext: Ciphertext<GroupElem>, privateKey: BigInteger) : DecryptionWithProof<GroupElem> {
+    fun decryptAndProve(ciphertext: Ciphertext<GroupElem>, privateKey: BigInteger) : DecryptionWithProof<GroupElem>? {
+        if (!isValidCiphertext(ciphertext)) return null
         val proof = createProof(ciphertext, privateKey)
         val plaintext = applyDecryptionFactor(ciphertext, proof.decryptionShare)
         return DecryptionWithProof(plaintext, proof)
@@ -63,6 +66,9 @@ class DecryptionZKP<GroupElem>(private val group: CyclicGroup<GroupElem>, privat
             statement = EqlogZKP.Statement(group.generator, ciphertext.x, publicKey, proof.decryptionShare),
             proof = proof.eqlogZKP
         )
+
+    private fun isValidCiphertext(ciphertext: Ciphertext<GroupElem>): Boolean =
+        group.validGroupElement(ciphertext.x) && group.validGroupElement(ciphertext.y)
 
     private fun validateInput(ciphertext: Ciphertext<GroupElem>, plaintext: BigInteger, proof: Proof<GroupElem>): VerificationResult =
         with(group) {
