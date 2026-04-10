@@ -36,15 +36,33 @@ class Cryptosystem<GroupElem>(val group: CyclicGroup<GroupElem>) {
             Ciphertext(powerOfG(randomCoin), (message * (encryptionKey pow randomCoin)))
         }
 
-    fun decrypt(secretKey: BigInteger, ciphertext: Ciphertext<GroupElem>): BigInteger =
-        with (group) {
+    /**
+     * Decrypts the given [ciphertext] using the [secretKey].
+     *
+     * @return The decrypted plaintext, or null if the input is incorrect (the ciphertext contains invalid group elements)
+     */
+    fun decrypt(secretKey: BigInteger, ciphertext: Ciphertext<GroupElem>): BigInteger? {
+        if (!isValidCiphertext(ciphertext)) return null
+        return with (group) {
             decode(ciphertext.y / (ciphertext.x pow secretKey))
         }
+    }
 
-    fun decryptWithoutDecoding(secretKey: BigInteger, ciphertext: Ciphertext<GroupElem>): GroupElem =
-        with (group) {
+    /**
+     * Decrypts the given [ciphertext] using the [secretKey], returning the raw group element
+     * without decoding it to a plaintext integer.
+     *
+     * @return The decrypted group element, or null if the ciphertext contains invalid group elements.
+     */
+    fun decryptWithoutDecoding(secretKey: BigInteger, ciphertext: Ciphertext<GroupElem>): GroupElem? {
+        if (!isValidCiphertext(ciphertext)) return null
+        return with (group) {
             ciphertext.y / (ciphertext.x pow secretKey)
         }
+    }
+
+    private fun isValidCiphertext(ciphertext: Ciphertext<GroupElem>): Boolean =
+        group.validGroupElement(ciphertext.x) && group.validGroupElement(ciphertext.y)
 
     /**
      * Re-randomizes the given [ciphertext] (encrypted with [encryptionKey]) using the provided [randomCoin].

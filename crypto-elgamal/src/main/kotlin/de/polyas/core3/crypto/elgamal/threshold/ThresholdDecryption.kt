@@ -80,12 +80,14 @@ class ThresholdDecryption<GroupElem>(
      * @param cipherText
      * Ciphertext to be decrypted
      *
-     * @return Decryption share along with a zero-knowledge proof.
+     * @return Decryption share along with a zero-knowledge proof,
+     *         or null if the input is incorrect (ciphertext contains invalid group elements).
      */
     fun decryptionShare(
         keyShare: PrivateKeyShare<GroupElem>,
         cipherText: Ciphertext<GroupElem>
-    ): DecryptionShare<GroupElem> {
+    ): DecryptionShare<GroupElem>? {
+        if (!isValidCiphertext(cipherText)) return null
         val partialDecryption: GroupElem = cipherText.x pow keyShare.keyShare
         val eqlogNIZKP = EqlogNIZKP(group)
         val statement = EqlogZKP.Statement(group.generator, cipherText.x, keyShare.commitment, partialDecryption)
@@ -133,13 +135,13 @@ class ThresholdDecryption<GroupElem>(
      * Decryption shares of (at least t) tellers for the given
      * ciphertext.
      *
-     * @return The decrypted plaintext.
+     * @return The decrypted plaintext, or null if the ciphertext contains invalid group elements.
      */
     fun finalizeDecryption(
         ciphertext: Ciphertext<GroupElem>,
         decryptionShares: List<DecryptionShare<GroupElem>>
-    ): BigInteger =
-        group.decode(finalizeDecryptionUnmapped(ciphertext, decryptionShares))
+    ): BigInteger? =
+        finalizeDecryptionUnmapped(ciphertext, decryptionShares)?.let { group.decode(it) }
 
     /**
      * Combines the given decryption shares to finalize decryption without applying
@@ -151,15 +153,20 @@ class ThresholdDecryption<GroupElem>(
      * @param decryptionShares
      * Decryption shares of (at least t) tellers for the given
      * ciphertext.
-     * @return The decrypted plaintext as an element of the group G.
+     * @return The decrypted plaintext as an element of the group G,
+     *         or null if the ciphertext contains invalid group elements.
      */
     private fun finalizeDecryptionUnmapped(
         ciphertext: Ciphertext<GroupElem>,
         decryptionShares: List<DecryptionShare<GroupElem>>
-    ): GroupElem {
+    ): GroupElem? {
+        if (!isValidCiphertext(ciphertext)) return null
         val s = combineDecryptionShares(decryptionShares)
         return ciphertext.y * group.inverse(s)
     }
+
+    private fun isValidCiphertext(ciphertext: Ciphertext<GroupElem>): Boolean =
+        group.validGroupElement(ciphertext.x) && group.validGroupElement(ciphertext.y)
 
     private fun combineDecryptionShares(decryptionShares: List<DecryptionShare<GroupElem>>): GroupElem {
         require(decryptionShares.size >= config.t)

@@ -58,10 +58,10 @@ class ThresholdDecryptionTest {
 
         // Decryption
         val decryptionShares = privateKeyShares.map { keyShare ->
-            th.decryptionShare(keyShare, encrypted)
+            th.decryptionShare(keyShare, encrypted)!!
         }
         val selectedShares = decryptionShares.filter { share -> share.nr <= t }
-        val dec = th.finalizeDecryption(encrypted, selectedShares)
+        val dec = th.finalizeDecryption(encrypted, selectedShares)!!
         assertEquals(plaintext, dec)
     }
 
@@ -95,13 +95,13 @@ class ThresholdDecryptionTest {
         val plaintext = BigInteger("1234567890")
         val encrypted = cryptosystem.encrypt(publicKey, plaintext)
         val decryptionShares: List<DecryptionShare<GroupElem>> = privateKeyShares.map { ks ->
-            th.decryptionShare(ks, encrypted)
+            th.decryptionShare(ks, encrypted)!!
         }
         val selectedShares: List<DecryptionShare<GroupElem>> = decryptionShares.filter { (nr) -> nr <= t }
         selectedShares.forEach { s: DecryptionShare<GroupElem> ->
             th.verifyDecryptionShareZKP(s, encrypted, pksMap[s.nr]!!)
         }
-        val dec = th.finalizeDecryption(encrypted, selectedShares)
+        val dec = th.finalizeDecryption(encrypted, selectedShares)!!
         assertEquals(plaintext, dec)
     }
 

@@ -34,7 +34,7 @@ class CryptosystemTest {
     private fun <G> testEncrypt(ctx: Ctx<G>) {
         val plaintext = SRNG.nextBigInt(ctx.group.messageUpperBound())
         val encrypted = ctx.cs.encrypt(ctx.pk, plaintext)
-        val decrypted = ctx.cs.decrypt(ctx.sk, encrypted)
+        val decrypted = ctx.cs.decrypt(ctx.sk, encrypted)!!
         assertEquals(plaintext, decrypted)
     }
 
@@ -47,7 +47,7 @@ class CryptosystemTest {
     private fun <G> testEncryptRaw(ctx: Ctx<G>) {
         val e = ctx.group.elementsFromSeed(1, "abc9876")[0]
         val encrypted = ctx.cs.encryptGroupElement(ctx.pk, e)
-        val decrypted = ctx.cs.decryptWithoutDecoding(ctx.sk, encrypted)
+        val decrypted = ctx.cs.decryptWithoutDecoding(ctx.sk, encrypted)!!
         assertEquals(e, decrypted)
     }
 
@@ -66,14 +66,14 @@ class CryptosystemTest {
         val reEncrypted0 = ctx.cs.reRandomize(encrypted, ctx.pk, BigInteger.ZERO)
         assertEquals(encrypted.x, reEncrypted0.x)
         assertEquals(encrypted.y, reEncrypted0.y)
-        val decrypted0 = ctx.cs.decryptWithoutDecoding(ctx.sk, reEncrypted0)
+        val decrypted0 = ctx.cs.decryptWithoutDecoding(ctx.sk, reEncrypted0)!!
         assertEquals(e, decrypted0)
 
         // re-encryption with random re-encryption coin
         val reEncrypted = ctx.cs.reRandomize(encrypted, ctx.pk, reEncryptionCoin)
         assertNotEquals(encrypted.x, reEncrypted.x)
         assertNotEquals(encrypted.y, reEncrypted.y)
-        val decrypted = ctx.cs.decryptWithoutDecoding(ctx.sk, reEncrypted)
+        val decrypted = ctx.cs.decryptWithoutDecoding(ctx.sk, reEncrypted)!!
         assertEquals(e, decrypted)
     }
 }

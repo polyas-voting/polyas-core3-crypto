@@ -114,7 +114,7 @@ class ElgamalGroupTest {
         val pk = g.powerOfG(sk)
         val plaintext = BigInteger.valueOf(1234)
         val encrypted: Ciphertext<BigInteger> = cs.encrypt(pk, plaintext)
-        val decrypted = cs.decrypt(sk, encrypted)
+        val decrypted = cs.decrypt(sk, encrypted)!!
         assertEquals(plaintext, decrypted)
     }
 
