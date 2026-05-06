@@ -78,25 +78,4 @@ class SRNGTest {
             assertTrue(begin > end)
         }
     }
-
-    @Test
-    fun `foo sampling bytes`() {
-        val upperBound = BigInteger.valueOf(710000000000000)
-        data class Event(val modulus: BigInteger, val value: BigInteger)
-        val events = mutableListOf<Event>()
-        val myInterceptor = object : SRNG.Interceptor {
-            override fun bytes(bytes: ByteArray) { }
-            override fun other() { }
-            override fun bi(modulus: BigInteger, value: BigInteger) {
-                events += Event(modulus, value)
-            }
-        }
-
-        SRNG.setInterceptor(myInterceptor)
-        val sampled = SRNG.nextBigInt(upperBound)
-        SRNG.resetInterceptor()
-
-        val expectedEvent = Event(upperBound, sampled)
-        assertTrue(expectedEvent in events)
-    }
 }

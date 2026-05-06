@@ -17,7 +17,7 @@ import java.util.concurrent.atomic.AtomicLong
 /**
  * A guarder (instrumented) secure random number generator, backed by an instance of SecureRandom.
  *
- * **The first instrumentation** allows one to see how many users (client code instances)
+ * **The instrumentation** allows one to see how many users (client code instances)
  * are using the underlying instance of SecureRandom at a given time.
  * In order to use the encapsulated SecureRandom object, the user code must first _lend_ it.
  * Each lending increases the 'begin' counter at the beginning of the lend and
@@ -30,33 +30,11 @@ import java.util.concurrent.atomic.AtomicLong
  * of the 'begin' and 'end' counters: if the difference between these two counters
  * is big, it means that there are many operations that started, but not finished,
  * which may indicate a dried-out entropy pool.
- *
- * **The second instrumentation** is intended for a specific testing use case:
- * it allows the client to intercept the sampled random values, in order to
- * record a complete protocol transcript. It is used for generation of deterministic
- * test cases for testing interoperability of different implementations.
- * **This instrumentation is not intended for production use.**
  */
-object SRNG {
+object SRNG: RandomBigIntSource {
     private val random : Random = SecureRandom.getInstanceStrong() // the Random which backs this object
     private val beginUse = AtomicLong(0L)
     private val endUse = AtomicLong(0L)
-    private var interceptor: Interceptor? = null
-
-    /**
-     * Wire up the given interceptor to this object. Throws if an interceptor is already wired.
-     */
-    fun setInterceptor(interceptor: Interceptor?) {
-        require(this.interceptor == null) { "Interceptor cannot be set, because it is already set" }
-        this.interceptor = interceptor
-    }
-
-    /**
-     * Removes the interceptor (if one is wired).
-     */
-    fun resetInterceptor() {
-        interceptor = null
-    }
 
     /**
      * Returns the `begin` lending counter.
@@ -74,7 +52,6 @@ object SRNG {
     fun nextBytes(bytes: ByteArray) {
         lend { r: Random ->
             r.nextBytes(bytes)
-            this.interceptor?.bytes(bytes)
         }
     }
 
@@ -97,10 +74,8 @@ object SRNG {
     /**
      * Samples a random [BigInteger] in the range [0, upperBound).
      */
-    fun nextBigInt(upperBound: BigInteger): BigInteger =
+    override fun nextBigInt(upperBound: BigInteger): BigInteger =
         nextBigIntImpl(upperBound)
-            .also { interceptor?.bi(upperBound, it) }
-
 
     /**
      * Samples a random [BigInteger] in the range [lower, upper).
@@ -109,14 +84,13 @@ object SRNG {
         lower + nextBigInt(upper - lower)
 
     /**
-     * Provides the underlying SRND for non-restricted usage without intercepting.
-     * The 'begin' lending counter is incremented before the block [userOfRandom]
+     * Provides the underlying SRND for bulk usage:
+     * The 'begin' lending counter is incremented once before the block [userOfRandom]
      * is executed with the underlying SRND; the 'end' lending counter is incremented
      * after the execution of this block has finished.
      */
     fun <T> use(userOfRandom: (Random) -> T): T {
         val result = lend(userOfRandom)
-        this.interceptor?.other()
         return result
     }
 
@@ -138,14 +112,8 @@ object SRNG {
             endUse.incrementAndGet() // increase the count of finished use instances
         }
     }
+}
 
-    /**
-     * An interceptor which, if plugged in to this object, receives the random
-     * values returned by the methods of this object.
-     */
-    interface Interceptor {
-        fun bytes(bytes: ByteArray)
-        fun bi(modulus: BigInteger, value: BigInteger)
-        fun other()
-    }
+interface RandomBigIntSource {
+    fun nextBigInt(upperBound: BigInteger): BigInteger
 }
