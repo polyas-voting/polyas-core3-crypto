@@ -13,6 +13,8 @@ import com.fasterxml.jackson.annotation.JsonCreator
 import com.fasterxml.jackson.annotation.JsonValue
 import de.polyas.core3.crypto.annotation.Doc
 import org.bouncycastle.util.encoders.Hex
+import java.nio.ByteBuffer
+import java.nio.CharBuffer
 import java.nio.charset.StandardCharsets
 import java.util.*
 import kotlin.math.min
@@ -23,7 +25,7 @@ import kotlin.math.min
  *
  * To build a message, use function [buildMessage].
  *
- * To deconstruct a message, use [Message.destructor]
+ * To deconstruct a message, use [destructor]
  */
 @Doc("Sequence of bytes represented as a hexadecimal string")
 class Message internal constructor(
@@ -43,6 +45,15 @@ class Message internal constructor(
     fun asBase64(): String = base64Encoder.encodeToString(asBytes())
 
     fun asUtf8String(): String = String(asBytes(), StandardCharsets.UTF_8)
+
+    fun asUtf8CharArray(): CharArray {
+        val byteBuffer: ByteBuffer = ByteBuffer.wrap(buf, offset, len) // wraps our buf
+        val charBuffer: CharBuffer = StandardCharsets.UTF_8.decode(byteBuffer)
+        val result = CharArray(charBuffer.remaining())
+        charBuffer.get(result)
+        charBuffer.array().fill('\u0000') // wipe out the content of charBuffer so that no unnecessary copy of the date is left
+        return result
+    }
 
     fun length(): Int = len
 

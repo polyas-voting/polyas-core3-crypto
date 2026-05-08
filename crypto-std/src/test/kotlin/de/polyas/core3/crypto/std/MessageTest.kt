@@ -238,6 +238,36 @@ class MessageTest {
     }
 
     @Test
+    fun `asUtf8CharArray decodes UTF-8 bytes to char array`() {
+        val text = "Hello, World!"
+        val msg = Message.fromUTF8String(text)
+        assertContentEquals(text.toCharArray(), msg.asUtf8CharArray())
+    }
+
+    @Test
+    fun `asUtf8CharArray decodes a fragment of message correctly`() {
+        val text = "Hello, World!"
+        val fragment24 = "llo,"
+        val msg0 = Message.fromUTF8String(text)
+        val msg = Message(msg0.array(), offset = 2, len = 4)
+        assertEquals(fragment24, msg.asUtf8String())
+        assertContentEquals(fragment24.toCharArray(), msg.asUtf8CharArray())
+    }
+
+    @Test
+    fun `asUtf8CharArray handles multibyte characters`() {
+        val text = "Sch\u00f6ne Gr\u00fc\u00dfe \u2603"
+        val msg = Message.fromUTF8String(text)
+        assertContentEquals(text.toCharArray(), msg.asUtf8CharArray())
+    }
+
+    @Test
+    fun `asUtf8CharArray on empty message returns empty array`() {
+        val msg = Message.fromBytes(ByteArray(0))
+        assertContentEquals(charArrayOf(), msg.asUtf8CharArray())
+    }
+
+    @Test
     fun `message and bytes builders are compatible`() {
         fun MessageConstructor.putContent() {
             for (i in 0 until 1000) {
