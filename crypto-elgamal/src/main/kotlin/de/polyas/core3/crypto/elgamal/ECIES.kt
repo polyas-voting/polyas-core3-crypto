@@ -14,6 +14,7 @@ import de.polyas.core3.crypto.elgamal.instance.EllipticCurveInst
 import de.polyas.core3.crypto.std.SRNG
 import de.polyas.core3.crypto.std.Hashes.sha256
 import de.polyas.core3.crypto.std.Message
+import de.polyas.core3.crypto.std.RandomBigIntSource
 import de.polyas.core3.crypto.std.SymmetricKey
 import de.polyas.core3.crypto.std.buildMessage
 import java.math.BigInteger
@@ -32,8 +33,8 @@ object ECIES {
     fun derivePublicKey(secretKey: BigInteger): ECElement =
         group.powerOfG(secretKey)
 
-    fun encrypt(publicKey: ECElement, message: Message): Message = with (group) {
-        val y = SRNG.nextBigInt(order)
+    fun encrypt(publicKey: ECElement, message: Message, randomSource: RandomBigIntSource = SRNG): Message = with (group) {
+        val y = randomSource.nextBigInt(order)
         val Y = generator pow y
         val Z = publicKey pow y
         val symKey = deriveSymmetricKey(Y, Z, publicKey)
