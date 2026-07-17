@@ -21,7 +21,7 @@
         <kotlin.version>2.3.21</kotlin.version>
         <java.version>25</java.version>
 
-        <jackson.version>2.21.3</jackson.version>
+        <jackson.version>2.22.1</jackson.version>
         <bouncycastle.version>1.84</bouncycastle.version>
     </properties>
 
